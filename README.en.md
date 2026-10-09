@@ -1,45 +1,96 @@
 # DSH EvoForge
 
-[![verify](https://github.com/doublezerolv-lab/dsh-plugin-evoforge/actions/workflows/ci.yml/badge.svg)](https://github.com/doublezerolv-lab/dsh-plugin-evoforge/actions/workflows/ci.yml) · MIT · Experimental early release
+[![verify](https://github.com/doublezerolv-lab/dsh-plugin-evoforge/actions/workflows/ci.yml/badge.svg)](https://github.com/doublezerolv-lab/dsh-plugin-evoforge/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-An auditable Tool and Skill evolution bundle for DeepSeek Harness. Observe mode is the default. Generated capabilities remain private until independently verified and explicitly approved by a human.
+**Turn recurring tasks into reusable tools and skills.**
 
-Verified runtime pairs: DSH `0.2.0-rc.2` / Cordis `4.0.4`, and DSH `0.2.1-alpha.1` / Cordis `4.0.5-alpha.1`. Peer declarations allow only these exact versions; development dependencies remain pinned to the alpha pair. Inspected the installed Desktop runtime and upstream commit `5badb15009ae1756c3afe0ae0cef1faafc290ccc`. No Harness core modifications.
+EvoForge is a Tool / Skill evolution plugin for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness). It identifies capability gaps, repeated code and reusable workflows from task trajectories, generates candidates, and adds verified, human-approved capabilities to Harness for use in later sessions.
 
-The plugin uses the real `session/event` feed, `ctx.tools.register()`, `ctx.skills.register()` and `ctx.llm.stream()` APIs. It adds redacted trajectories, rule-based gap detection, explainable cost-aware evolution, bounded synthesis/repair, Docker verification, atomic versioned persistence and a human CLI approval boundary. Official registries retain ownership of tool execution and skill discovery.
+[中文](README.md) · [Tutorial](docs/tutorial.md) · [Configuration example](examples/generation.patch.yml) · [Architecture](docs/architecture.md)
+
+## Features
+
+- **Task observation**: capture session events, tool calls, elapsed time and token usage, with persistent trajectories and replay.
+- **Capability discovery**: detect missing tools, repeated code, multi-step workflows, slow calls and execution failures.
+- **Tool and Skill generation**: use a model configured in Harness to generate TypeScript tools with JSON inputs and outputs, or reusable Skill workflows, with generation budgets and bounded repair attempts.
+- **Verification and approval**: check tool candidates against independent samples in a Docker sandbox, then review and approve them before activation.
+- **Reuse across sessions**: register approved capabilities with the Harness Tool / Skill Registry, persist them across restarts, and make them available in new sessions.
+- **Version and cost management**: deduplication, versioning, retirement, rollback, usage statistics, and decisions to create, reuse, improve, retire or defer capabilities.
+
+**Observe mode** is the default. Enable generation when ready; candidates still require verification and human approval before activation. Trajectories omit prompt and output bodies by default and redact sensitive fields.
+
+## Use cases
+
+- Turn recurring log analysis and text parsing code into reusable tools.
+- Package common multi-step tasks as Skills for later tasks.
+- Manage Agent capabilities through candidate review, approval, version history and usage statistics.
+
+## Workflow
+
+Observe tasks → Identify reusable capabilities → Generate candidates → Verify samples → Approve → Reuse
+
+Tool candidates execute in Docker containers with networking disabled, a non-root user, a read-only root filesystem, and resource and time limits. Skills support workflow contract and tool dependency checks.
+
+## Quick start
+
+Requires Node.js 22+, npm and DeepSeek Harness. Tool execution and verification require Docker Linux containers.
+
+### Build and install
+
+Clone this repository and run from the project directory:
 
 ```sh
 npm ci --ignore-scripts
-npm run check
-npm run demo
-npm run benchmark
-npm pack --pack-destination artifacts
+npm run build
+dsh plugin --profile YOUR_PROFILE add /absolute/path/to/dsh-plugin-evoforge
 ```
 
-On this Windows workspace, `dev.cmd check`, `dev.cmd demo` and `dev.cmd benchmark` also use the prepared portable Node distribution. The demo uses real Cordis and Session services with explicitly authored example events.
+Replace the profile and path with your own. For Desktop installation, see the [tutorial](docs/tutorial.md).
 
-Install into a matching test profile:
+### Enable generation
 
-```sh
-dsh plugin --profile YOUR_TEST_PROFILE add /absolute/path/to/dsh-plugin-evoforge
-dsh --profile YOUR_TEST_PROFILE --dump-config
+EvoForge uses model routes already configured in Harness, including DeepSeek account login. Set `provider` and `model` using the [generation configuration example](examples/generation.patch.yml), then enable:
+
+```yaml
+enableGeneration: true
+autoEvolution: true
+requireApproval: true
 ```
 
-For generated tools, prepare the trusted Linux sandbox image explicitly:
+With DeepSeek account login, EvoForge needs no separate API key. See the [account configuration example](examples/deepseek-account.patch.yml).
+
+### Manage tools
+
+This example uses `.evoforge` as its storage directory. To manage an installed plugin, use its configured `storageDir`.
 
 ```sh
 docker build -t evoforge-sandbox:1 sandbox
-node dist/cli.js import examples/log-parser.json
-node dist/cli.js verify tool:evoforge-log-summary@1
-node dist/cli.js approve tool:evoforge-log-summary@1 --reviewer YOUR_NAME
+node dist/cli.js import examples/log-parser.json --storage .evoforge
+node dist/cli.js verify tool:evoforge-log-summary@1 --storage .evoforge
+node dist/cli.js show tool:evoforge-log-summary@1 --storage .evoforge
+node dist/cli.js approve tool:evoforge-log-summary@1 --reviewer YOUR_NAME --storage .evoforge
 ```
 
-Without Docker, executable verification fails closed. Generated code never runs on the host. Containers disable networking, use a read-only root, drop capabilities, run as a non-root user, and enforce memory, CPU, process, output and time bounds. Only an isolated temporary artifact directory is mounted. `requireApproval: false` is rejected in this release.
+Harness loads the approved tool when using the same storage directory. The Agent can select it for tasks such as counting INFO, WARN, ERROR and malformed log lines.
 
-The mock benchmark executes identical independently scored tasks across Baseline, ephemeral CodeGen and persisted EvoForge strategies. It measures real implementation elapsed time, generation attempts, reuse and prompt bytes. The mock executor runs trusted authored logic instead of generated source. Mock proofs cannot activate executable tools. Unknown token and monetary costs are `null`; these results provide no claim about LLM efficacy. Cold generation and later reuse costs are reported separately, including overhead unfavorable to EvoForge.
+The CLI also provides `analyze`, `list`, `samples`, `retire`, `rollback`, `audit` and `export-skill`. See the [tutorial](docs/tutorial.md) for details.
 
-Both supported runtime pairs pass all 23 tests with Docker enabled, including actual container execution and hard deadline cleanup. Docker tests remain opt-in. Skill checks validate workflow contracts, not model adherence. See [architecture](docs/architecture.md), [tutorial](docs/tutorial.md), [benchmark methodology](docs/benchmark.md) and [delivery status](docs/status.md).
+## Compatibility
 
-Human-specified real generation and reuse pass: the installed Harness account adapter generated a log Tool that passed four independent Docker samples. After the user approved this exact candidate, Agents in two new Sessions called it successfully and produced the expected counts. The first task named the Tool; the second did not, and the Agent selected it itself. Registry uses/successes are both 2; event elapsed times were 938 and 3386 ms. The first generation response failed JSON parsing; both generation calls totalled 3210 measured tokens. These are individual log-task results, not general success-rate or performance claims. Autonomous gap-triggered generation and full Agent benchmarks remain unverified. See [live validation](docs/live-validation.md).
+| DeepSeek Harness | Cordis |
+| --- | --- |
+| `0.2.0-rc.2` | `4.0.4` |
+| `0.2.1-alpha.1` | `4.0.5-alpha.1` |
 
-MIT License. The npm package is not published; build and install locally using the tutorial. Account calls may consume quota; monetary cost is unknown.
+Use matching DSH dependency versions in the same environment.
+
+## Development
+
+```sh
+npm run check
+npm run demo
+```
+
+## License
+
+[MIT](LICENSE)
