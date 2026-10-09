@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process'
-import { mkdtemp, writeFile, rm } from 'node:fs/promises'
+import { mkdtemp, writeFile, rm, chmod } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
@@ -47,6 +47,10 @@ export class DockerSandbox implements Sandbox {
     const dir = await mkdtemp(join(tmpdir(), 'evoforge-sandbox-'))
     const name = `evoforge-${randomUUID()}`
     try {
+      // mkdtemp creates 0700 directories on POSIX. The non-root container
+      // must be able to traverse its read-only bind mount; only the owner
+      // retains write access to these generated artifacts.
+      await chmod(dir, 0o755)
       await writeFile(join(dir, 'tool.mjs'), javascript, { mode: 0o644 })
       await writeFile(join(dir, 'runner.mjs'),
         "import { run } from './tool.mjs';\nlet text='';for await(const chunk of process.stdin){text+=chunk;if(text.length>262144)throw new Error('input limit');}\nconst result=await run(JSON.parse(text));\nconst out=JSON.stringify(result);if(out===undefined||out.length>1048576)throw new Error('output limit');\nprocess.stdout.write(out);\n", { mode: 0o644 })
