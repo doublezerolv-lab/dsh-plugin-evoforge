@@ -1,0 +1,13 @@
+# Overlay for an already installed EvoForge entry in a logged-in Harness profile.
+# Official model ID for the UI display name DeepSeek-V41-Flash.
+- id: evoforge
+  config:
+    storageDir: .evoforge
+    enableGeneration: false
+    autoEvolution: false
+    requireApproval: true
+    provider: deepseek-account
+    model: deepseek-flash
+    generationBudgetTokens: 12000
+    verificationBudget: 12
+    maxRepairs: 1

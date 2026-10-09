@@ -1,0 +1,8 @@
+- insert:
+    - id: evoforge
+      name: dsh-plugin-evoforge
+      config:
+        storageDir: .evoforge
+        enableGeneration: false
+        autoEvolution: false
+        requireApproval: true

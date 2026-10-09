@@ -1,0 +1,15 @@
+{
+  "kind": "tool",
+  "name": "evoforge-log-summary",
+  "description": "Count INFO, WARN and ERROR entries in timestamped logs and report malformed lines",
+  "taskType": "log-summary",
+  "dependencies": [],
+  "code": "export function run(input: { text: string }): { counts: { INFO: number; WARN: number; ERROR: number }; malformed: number } { const counts = { INFO: 0, WARN: 0, ERROR: 0 }; let malformed = 0; for (const line of input.text.split(/\\r?\\n/)) { if (!line.trim()) continue; const match = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z (INFO|WARN|ERROR) .+$/.exec(line); if (!match) { malformed++; continue; } counts[match[1] as keyof typeof counts]++; } return { counts, malformed }; }",
+  "inputSchema": { "type": "object", "properties": { "text": { "type": "string" } }, "required": ["text"], "additionalProperties": false },
+  "outputSchema": { "type": "object", "properties": { "counts": { "type": "object", "properties": { "INFO": { "type": "integer" }, "WARN": { "type": "integer" }, "ERROR": { "type": "integer" } }, "required": ["INFO", "WARN", "ERROR"], "additionalProperties": false }, "malformed": { "type": "integer" } }, "required": ["counts", "malformed"], "additionalProperties": false },
+  "samples": [
+    { "source": "independent", "label": "empty", "input": { "text": "" }, "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 0 }, "malformed": 0 } },
+    { "source": "independent", "label": "mixed-and-malformed", "input": { "text": "2026-10-09T08:00:00Z INFO ready\n2026-10-09T08:00:01Z ERROR timeout\ninvalid\n2026-10-09T08:00:02Z WARN retry" }, "expected": { "counts": { "INFO": 1, "WARN": 1, "ERROR": 1 }, "malformed": 1 } },
+    { "source": "independent", "label": "crlf", "input": { "text": "2026-10-09T08:00:00Z ERROR first\r\n\r\n2026-10-09T08:00:01Z ERROR second" }, "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 2 }, "malformed": 0 } }
+  ]
+}

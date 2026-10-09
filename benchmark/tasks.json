@@ -1,0 +1,14 @@
+[
+  { "id": "empty", "text": "", "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 0 }, "malformed": 0 } },
+  { "id": "info", "text": "2026-10-09T08:00:00Z INFO boot", "expected": { "counts": { "INFO": 1, "WARN": 0, "ERROR": 0 }, "malformed": 0 } },
+  { "id": "error", "text": "2026-10-09T08:00:00Z ERROR down", "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 1 }, "malformed": 0 } },
+  { "id": "warn", "text": "2026-10-09T08:00:00Z WARN retry", "expected": { "counts": { "INFO": 0, "WARN": 1, "ERROR": 0 }, "malformed": 0 } },
+  { "id": "malformed", "text": "not a log", "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 0 }, "malformed": 1 } },
+  { "id": "mixed", "text": "2026-10-09T08:00:00Z INFO boot\n2026-10-09T08:00:01Z ERROR down\n2026-10-09T08:00:02Z WARN retry", "expected": { "counts": { "INFO": 1, "WARN": 1, "ERROR": 1 }, "malformed": 0 } },
+  { "id": "crlf", "text": "2026-10-09T08:00:00Z ERROR first\r\n2026-10-09T08:00:01Z ERROR second", "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 2 }, "malformed": 0 } },
+  { "id": "blank", "text": "\n\n  \n", "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 0 }, "malformed": 0 } },
+  { "id": "bad-level", "text": "2026-10-09T08:00:00Z DEBUG trace", "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 0 }, "malformed": 1 } },
+  { "id": "lowercase", "text": "2026-10-09T08:00:00Z error down", "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 0 }, "malformed": 1 } },
+  { "id": "blank-and-info", "text": "\n2026-10-09T08:00:00Z INFO boot\n", "expected": { "counts": { "INFO": 1, "WARN": 0, "ERROR": 0 }, "malformed": 0 } },
+  { "id": "missing-message", "text": "2026-10-09T08:00:00Z INFO ", "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 0 }, "malformed": 1 } }
+]

@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-09",
+  "runtime": "0.2.0-rc.2",
+  "scope": "New Desktop Session; tool name explicitly requested",
+  "tool": "evoforge-live-log-summary",
+  "turn": 1,
+  "actual": {
+    "counts": {
+      "INFO": 1,
+      "WARN": 1,
+      "ERROR": 2
+    },
+    "malformed": 1
+  },
+  "expected": {
+    "counts": {
+      "INFO": 1,
+      "WARN": 1,
+      "ERROR": 2
+    },
+    "malformed": 1
+  },
+  "matchesExpected": true,
+  "toolError": false,
+  "durationMs": 938,
+  "completed": true
+}

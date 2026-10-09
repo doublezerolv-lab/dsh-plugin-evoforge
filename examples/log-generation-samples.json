@@ -1,0 +1,26 @@
+[
+  {
+    "source": "independent",
+    "label": "empty",
+    "input": { "text": "" },
+    "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 0 }, "malformed": 0 }
+  },
+  {
+    "source": "independent",
+    "label": "mixed-and-malformed",
+    "input": { "text": "2026-10-09T08:00:00Z INFO ready\n2026-10-09T08:00:01Z ERROR timeout\ninvalid\n2026-10-09T08:00:02Z WARN retry" },
+    "expected": { "counts": { "INFO": 1, "WARN": 1, "ERROR": 1 }, "malformed": 1 }
+  },
+  {
+    "source": "independent",
+    "label": "crlf-and-blank-lines",
+    "input": { "text": "2026-10-09T08:00:00Z ERROR first\r\n\r\n2026-10-09T08:00:01Z ERROR second" },
+    "expected": { "counts": { "INFO": 0, "WARN": 0, "ERROR": 2 }, "malformed": 0 }
+  },
+  {
+    "source": "independent",
+    "label": "unsupported-level-and-missing-message",
+    "input": { "text": "2026-10-09T08:00:00Z DEBUG details\n2026-10-09T08:00:01Z INFO\n2026-10-09T08:00:02Z WARN retry" },
+    "expected": { "counts": { "INFO": 0, "WARN": 1, "ERROR": 0 }, "malformed": 2 }
+  }
+]

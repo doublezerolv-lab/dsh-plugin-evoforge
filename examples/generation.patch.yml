@@ -1,0 +1,12 @@
+# Explicit opt-in overlay. Replace provider/model with routes configured in your Harness.
+- id: evoforge
+  config:
+    storageDir: .evoforge
+    enableGeneration: true
+    autoEvolution: true
+    requireApproval: true
+    provider: YOUR_PROVIDER_ROUTE
+    model: YOUR_MODEL
+    generationBudgetTokens: 12000
+    verificationBudget: 12
+    maxRepairs: 1

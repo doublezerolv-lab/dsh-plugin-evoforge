@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-09",
+  "runtime": "0.2.0-rc.2",
+  "modelDisplayName": "DeepSeek-V41-Flash",
+  "provider": "deepseek-account",
+  "model": "deepseek-flash",
+  "scope": "Human-specified log generation; automatic gap discovery not tested",
+  "generationAttempts": [
+    {
+      "status": "failed",
+      "calls": [
+        {
+          "durationMs": 4831.3445,
+          "usage": {
+            "inputTokens": 713,
+            "outputTokens": 1360,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "totalTokens": 2073
+          },
+          "finish": {
+            "kind": "stop"
+          }
+        }
+      ]
+    },
+    {
+      "status": "verified-awaiting-human-approval",
+      "calls": [
+        {
+          "durationMs": 1960.8224999999998,
+          "usage": {
+            "inputTokens": 737,
+            "outputTokens": 400,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "totalTokens": 1137
+          },
+          "finish": {
+            "kind": "stop"
+          }
+        }
+      ]
+    }
+  ],
+  "measuredTotalTokens": 3210,
+  "reservedBudget": {
+    "tokens": 8932,
+    "verifications": 4
+  },
+  "moneyCost": null,
+  "candidateId": "tool:evoforge-live-log-summary@1",
+  "fingerprint": "030c83b39ffc893369c5bccb0b3800e4fed4ea063d238c233c7d9e988f397b83",
+  "verification": {
+    "passed": true,
+    "fingerprint": "030c83b39ffc893369c5bccb0b3800e4fed4ea063d238c233c7d9e988f397b83",
+    "time": "2026-10-09T10:36:32.400Z",
+    "checks": [
+      "artifact/schema",
+      "typescript/compile",
+      "restricted-source",
+      "sample:empty",
+      "sample:mixed-and-malformed",
+      "sample:crlf-and-blank-lines",
+      "sample:unsupported-level-and-missing-message"
+    ],
+    "errors": [],
+    "independentSamples": 4,
+    "execution": "docker"
+  },
+  "humanApproved": true,
+  "newSessionReuse": "passed",
+  "generatedCandidateReuse": "passed in two new Sessions",
+  "registryStats": {
+    "uses": 2,
+    "successes": 2,
+    "totalDurationMs": 4314.766299999785,
+    "lastUsedAt": "2026-10-09T10:48:33.529Z"
+  },
+  "candidateStatus": "approved",
+  "autonomousSelection": "passed one task without requested tool name"
+}

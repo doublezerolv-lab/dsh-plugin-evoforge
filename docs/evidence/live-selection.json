@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-09",
+  "runtime": "0.2.0-rc.2",
+  "scope": "One new Desktop Session; no tool name requested in user task",
+  "tool": "evoforge-live-log-summary",
+  "taskTextFound": true,
+  "toolNamedInTask": false,
+  "actual": {
+    "counts": {
+      "INFO": 2,
+      "WARN": 0,
+      "ERROR": 1
+    },
+    "malformed": 2
+  },
+  "expected": {
+    "counts": {
+      "INFO": 2,
+      "WARN": 0,
+      "ERROR": 1
+    },
+    "malformed": 2
+  },
+  "matchesExpected": true,
+  "toolError": false,
+  "durationMs": 3386,
+  "completed": true
+}

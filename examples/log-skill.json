@@ -1,0 +1,11 @@
+{
+  "kind": "skill",
+  "name": "evoforge-log-workflow",
+  "description": "Summarize timestamped log levels and validate malformed entry counts",
+  "taskType": "log-summary-workflow",
+  "dependencies": ["evoforge-log-summary"],
+  "skillMarkdown": "---\nname: evoforge-log-workflow\ndescription: Summarize timestamped log levels and validate malformed entry counts\ntools: [evoforge-log-summary]\nchecks: [line-accounting]\n---\n## Workflow\nKeep the original log text unchanged. Call evoforge-log-summary with the text field. Record INFO, WARN, ERROR and malformed counts.\n## Validation\nPerform line-accounting: the sum of all level counts plus malformed must equal the number of nonempty input lines. Report malformed entries explicitly.\n## Limitations\nOnly UTC timestamps and three uppercase levels are supported. Numeric counts are exact for this format; other formats require a separate capability.\n",
+  "samples": [
+    { "source": "independent", "label": "reviewed-log-workflow", "input": { "availableTools": ["evoforge-log-summary"] }, "expected": { "tools": ["evoforge-log-summary"], "checks": ["line-accounting"] } }
+  ]
+}
